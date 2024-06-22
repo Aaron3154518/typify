@@ -241,6 +241,7 @@ pub(crate) enum DefaultImpl {
 #[derive(Debug, Default, Clone)]
 pub struct TypeSpaceSettings {
     type_mod: Option<String>,
+    extra_attributes: Vec<String>,
     extra_derives: Vec<String>,
     struct_builder: bool,
 
@@ -308,6 +309,7 @@ impl CrateVers {
 #[derive(Debug, Default, Clone)]
 pub struct TypeSpacePatch {
     rename: Option<String>,
+    attributes: Vec<String>,
     derives: Vec<String>,
 }
 
@@ -355,6 +357,14 @@ impl TypeSpaceSettings {
     /// Set the name of the path prefix for types defined in this [TypeSpace].
     pub fn with_type_mod<S: AsRef<str>>(&mut self, type_mod: S) -> &mut Self {
         self.type_mod = Some(type_mod.as_ref().to_string());
+        self
+    }
+
+    /// Add an additional attribute macro to apply to all defined types
+    pub fn with_attribute(&mut self, attr: String) -> &mut Self {
+        if !self.extra_attributes.contains(&attr) {
+            self.extra_attributes.push(attr);
+        }
         self
     }
 
@@ -460,6 +470,12 @@ impl TypeSpacePatch {
     /// Specify the new name for patched type.
     pub fn with_rename<S: ToString>(&mut self, rename: S) -> &mut Self {
         self.rename = Some(rename.to_string());
+        self
+    }
+
+    /// Specify an additional attribute macro to apply to the patched type
+    pub fn with_attribute<S: ToString>(&mut self, attr: S) -> &mut Self {
+        self.attributes.push(attr.to_string());
         self
     }
 

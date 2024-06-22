@@ -633,7 +633,6 @@ impl TypeEntry {
         let derive_set = ["Serialize", "Deserialize", "Debug", "Clone"]
             .into_iter()
             .collect::<BTreeSet<_>>();
-
         match &self.details {
             TypeEntryDetails::Enum(enum_details) => {
                 self.output_enum(type_space, output, enum_details, derive_set)
@@ -965,6 +964,11 @@ impl TypeEntry {
             }
         };
 
+        let attributes = type_space.settings.extra_attributes.iter().map(|attr| {
+            syn::parse_str::<syn::Path>(attr.as_str())
+                .unwrap()
+                .into_token_stream()
+        });
         let derives = strings_to_derives(
             derive_set,
             &self.extra_derives,
@@ -974,6 +978,7 @@ impl TypeEntry {
         let item = quote! {
             #doc
             #[derive(#(#derives),*)]
+            #(#[#attributes])*
             #serde
             pub enum #type_name {
                 #(#variants_decl)*
@@ -1079,6 +1084,11 @@ impl TypeEntry {
             });
         });
 
+        let attributes = type_space.settings.extra_attributes.iter().map(|attr| {
+            syn::parse_str::<syn::Path>(attr.as_str())
+                .unwrap()
+                .into_token_stream()
+        });
         let derives = strings_to_derives(
             derive_set,
             &self.extra_derives,
@@ -1091,6 +1101,7 @@ impl TypeEntry {
             quote! {
                 #doc
                 #[derive(#(#derives),*)]
+                #(#[#attributes])*
                 #serde
                 pub struct #type_name {
                     #(
@@ -1509,6 +1520,11 @@ impl TypeEntry {
             }
         });
 
+        let attributes = type_space.settings.extra_attributes.iter().map(|attr| {
+            syn::parse_str::<syn::Path>(attr.as_str())
+                .unwrap()
+                .into_token_stream()
+        });
         let derives = strings_to_derives(
             derive_set,
             &self.extra_derives,
@@ -1518,6 +1534,7 @@ impl TypeEntry {
         let item = quote! {
             #doc
             #[derive(#(#derives),*)]
+            #(#[#attributes])*
             #serde
             pub struct #type_name(#vis #inner_type_name);
 

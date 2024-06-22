@@ -73,6 +73,9 @@ pub fn import_types(item: TokenStream) -> TokenStream {
 #[derive(Deserialize)]
 struct MacroSettings {
     schema: ParseWrapper<LitStr>,
+    // TODO: syn::Attribute
+    #[serde(default)]
+    attributes: Vec<ParseWrapper<syn::Path>>,
     #[serde(default)]
     derives: Vec<ParseWrapper<syn::Path>>,
     #[serde(default)]
@@ -159,6 +162,8 @@ struct MacroPatch {
     #[serde(default)]
     rename: Option<String>,
     #[serde(default)]
+    attributes: Vec<ParseWrapper<syn::Path>>,
+    #[serde(default)]
     derives: Vec<ParseWrapper<syn::Path>>,
 }
 
@@ -167,6 +172,9 @@ impl From<MacroPatch> for TypeSpacePatch {
         let mut s = Self::default();
         a.rename.iter().for_each(|rename| {
             s.with_rename(rename);
+        });
+        a.attributes.iter().for_each(|attr| {
+            s.with_attribute(attr.to_token_stream());
         });
         a.derives.iter().for_each(|derive| {
             s.with_derive(derive.to_token_stream());
@@ -182,6 +190,7 @@ fn do_import_types(item: TokenStream) -> Result<TokenStream, syn::Error> {
     } else {
         let MacroSettings {
             schema,
+            attributes,
             derives,
             replace,
             patch,
@@ -191,6 +200,9 @@ fn do_import_types(item: TokenStream) -> Result<TokenStream, syn::Error> {
             crates,
         } = serde_tokenstream::from_tokenstream(&item.into())?;
         let mut settings = TypeSpaceSettings::default();
+        attributes.into_iter().for_each(|attr| {
+            settings.with_attribute(attr.to_token_stream().to_string());
+        });
         derives.into_iter().for_each(|derive| {
             settings.with_derive(derive.to_token_stream().to_string());
         });
