@@ -11,7 +11,7 @@ use crate::{
     enums::output_variant,
     output::{OutputSpace, OutputSpaceMod},
     structs::{generate_serde_attr, DefaultFunction},
-    util::{get_type_name, metadata_description, type_patch},
+    util::{get_type_name, metadata_description, type_patch, AttributeParser},
     DefaultImpl, Name, Result, TypeId, TypeSpace, TypeSpaceImpl,
 };
 
@@ -965,7 +965,7 @@ impl TypeEntry {
         };
 
         let attributes = type_space.settings.extra_attributes.iter().map(|attr| {
-            syn::parse_str::<syn::Path>(attr.as_str())
+            AttributeParser::parse_str_single(attr.as_str())
                 .unwrap()
                 .into_token_stream()
         });
@@ -1085,7 +1085,7 @@ impl TypeEntry {
         });
 
         let attributes = type_space.settings.extra_attributes.iter().map(|attr| {
-            syn::parse_str::<syn::Path>(attr.as_str())
+            AttributeParser::parse_str_single(attr.as_str())
                 .unwrap()
                 .into_token_stream()
         });
@@ -1521,7 +1521,7 @@ impl TypeEntry {
         });
 
         let attributes = type_space.settings.extra_attributes.iter().map(|attr| {
-            syn::parse_str::<syn::Path>(attr.as_str())
+            AttributeParser::parse_str_single(attr.as_str())
                 .unwrap()
                 .into_token_stream()
         });

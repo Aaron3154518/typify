@@ -311,6 +311,7 @@ pub struct TypeSpacePatch {
     rename: Option<String>,
     attributes: Vec<String>,
     derives: Vec<String>,
+    default: Option<bool>,
 }
 
 /// Contains the attributes of a replacement of an existing type.
@@ -482,6 +483,17 @@ impl TypeSpacePatch {
     /// Specify an additional derive to apply to the patched type.
     pub fn with_derive<S: ToString>(&mut self, derive: S) -> &mut Self {
         self.derives.push(derive.to_string());
+        self
+    }
+
+    /// Specify that this type should derive Default and serde(default)
+    pub fn with_default(&mut self) -> &mut Self {
+        self.default = Some(true);
+        self
+    }
+    /// Specify that this type should not derive Default and serde(default)
+    pub fn without_default(&mut self) -> &mut Self {
+        self.default = Some(false);
         self
     }
 }

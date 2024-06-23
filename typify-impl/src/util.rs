@@ -7,6 +7,7 @@ use schemars::schema::{
     ArrayValidation, InstanceType, Metadata, ObjectValidation, Schema, SchemaObject, SingleOrVec,
     StringValidation, SubschemaValidation,
 };
+use syn::{parse::Parse, Attribute};
 use unicode_ident::{is_xid_continue, is_xid_start};
 
 use crate::{Error, Name, RefKey, Result, TypeSpace};
@@ -1023,5 +1024,33 @@ mod tests {
         assert!(ach.is_valid("Shadrach"));
         assert!(ach.is_valid("Meshach"));
         assert!(!ach.is_valid("Abednego"));
+    }
+}
+
+// Used to parse attributes
+pub(crate) struct AttributeParser {
+    pub attrs: Vec<Attribute>,
+    no_attrs_err: syn::Error,
+}
+
+impl AttributeParser {
+    // Get the first attribute
+    pub fn get_first(self) -> syn::Result<Attribute> {
+        self.attrs.into_iter().next().ok_or(self.no_attrs_err)
+    }
+
+    // Parse a single attribute from a string
+    pub fn parse_str_single(s: &str) -> syn::Result<Attribute> {
+        syn::parse_str::<Self>(s)?.get_first()
+    }
+}
+
+impl Parse for AttributeParser {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        let attrs = input.call(Attribute::parse_outer)?;
+        Ok(Self {
+            no_attrs_err: input.error("No attributes"),
+            attrs,
+        })
     }
 }
