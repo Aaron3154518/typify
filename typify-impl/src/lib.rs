@@ -362,7 +362,10 @@ impl TypeSpaceSettings {
     }
 
     /// Add an additional attribute macro to apply to all defined types
-    pub fn with_attribute(&mut self, attr: String) -> &mut Self {
+    pub fn with_attribute(&mut self, mut attr: String) -> &mut Self {
+        if !attr.starts_with("#[") || !attr.ends_with("]") {
+            attr = format!("#[{attr}]");
+        }
         if !self.extra_attributes.contains(&attr) {
             self.extra_attributes.push(attr);
         }

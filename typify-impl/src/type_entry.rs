@@ -978,7 +978,7 @@ impl TypeEntry {
         let item = quote! {
             #doc
             #[derive(#(#derives),*)]
-            #(#[#attributes])*
+            #(#attributes)*
             #serde
             pub enum #type_name {
                 #(#variants_decl)*
@@ -1101,7 +1101,7 @@ impl TypeEntry {
             quote! {
                 #doc
                 #[derive(#(#derives),*)]
-                #(#[#attributes])*
+                #(#attributes)*
                 #serde
                 pub struct #type_name {
                     #(
@@ -1534,7 +1534,7 @@ impl TypeEntry {
         let item = quote! {
             #doc
             #[derive(#(#derives),*)]
-            #(#[#attributes])*
+            #(#attributes)*
             #serde
             pub struct #type_name(#vis #inner_type_name);
 
